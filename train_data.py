@@ -15,7 +15,7 @@ class TrainData:
     def download_data(self):
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Referer": "https://indianrailways.gov.in/index/index.html",
+            "Referer": "https://enquiry.indianrail.gov.in/mntes/",
             "Accept": "*/*",
         }
 
@@ -42,7 +42,7 @@ class TrainData:
             json.dump(stations, f, indent=2, ensure_ascii=False)
         print(f"Saved {len(stations)} stations to {self.data_type}.json")
 
-    def extract_stations(self):
+    def extract_stations_from_indianrailways(self):
         content = self.download_data()
         data = json.loads(content)
         stations = []
@@ -59,6 +59,18 @@ class TrainData:
                     "layer_depth": layer_depth,
                 }
                 stations.append(station)
+
+        self.save_to_json(stations)
+        return stations
+
+    def extract_stations(self):
+        content = self.download_data()
+        match = re.search(r"arrStationList\s*=\s*(\[.*?\])", content, re.DOTALL)
+        if not match:
+            raise ValueError("Could not find arrTrainList in response")
+
+        stations = json.loads(match.group(1))
+        print(f"Total stations: {len(stations)}")
 
         self.save_to_json(stations)
         return stations
@@ -87,14 +99,20 @@ class TrainData:
 
 
 if __name__ == "__main__":
-    station_url = "https://indianrailways.gov.in/index/index_data/data.js"
+    today = datetime.now().strftime("%Y%m%d")
 
-    station = TrainData(station_url, data_type="stations")
-    stations = station.extract_stations()
+    station_url = "https://indianrailways.gov.in/index/index_data/data.js"
+    station = TrainData(station_url, data_type="stations_indianrailways")
+    stations = station.extract_stations_from_indianrailways()
+    print(f"Total stations found from indianrailways: {len(stations)}")
+
+    station_url = f"https://enquiry.indianrail.gov.in/mntes/javascripts/station_data.js?v={today}08"
+
+    station_list = TrainData(station_url, data_type="stations")
+    stations = station_list.extract_stations()
     print(f"Total stations found: {len(stations)}")
 
     # Train
-    today = datetime.now().strftime("%Y%m%d")
     trains_url = f"https://enquiry.indianrail.gov.in/mntes/javascripts/train_data.js?v={today}10"  # Update record on 10AM daily
     trains = TrainData(trains_url, data_type="trains")
     train_list = trains.extract_trains()
