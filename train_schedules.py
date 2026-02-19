@@ -7,10 +7,49 @@ from bs4 import BeautifulSoup
 with open("data/trains.json") as f:
     trains = json.load(f)
 
-with open("data/stations.json") as f:
-    stations = json.load(f)
 
-valid_codes = {s["code"] for s in stations}
+# ── Browser ────────────────────────────────────────────────────────────────────
+
+url = "https://enquiry.indianrail.gov.in/mntes/"
+
+
+async def init_browser(playwright):
+    browser = await playwright.chromium.launch(headless=False)
+    context = await browser.new_context(
+        user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
+    )
+    return browser, await context.new_page()
+
+
+async def init_schedule_page(page):
+    await page.goto(url)
+    await page.wait_for_selector("input[name='trainNo']", timeout=10000)
+    await page.get_by_text("Train Schedule", exact=True).click()
+    await page.wait_for_selector("input[name='trainNo']", timeout=10000)
+
+
+async def fetch_schedule(page, train_no):
+    await page.fill("input[name='trainNo']", "")
+    await page.fill("input[name='trainNo']", str(train_no))
+
+    # Wait for navigation to complete after click
+    async with page.expect_navigation(wait_until="load", timeout=15000):
+        await page.click("input[value='Get Schedule']")
+
+    try:
+        await page.wait_for_selector("table tr td", timeout=10000)
+    except Exception:
+        return await page.content()
+
+    await page.wait_for_timeout(500)
+    return await page.content()
+
+
+async def recover(page):
+    await page.goto(url)
+    await page.wait_for_selector("input[name='trainNo']", timeout=10000)
+    await page.get_by_text("Train Schedule", exact=True).click()
+    await page.wait_for_selector("input[name='trainNo']", timeout=10000)
 
 
 # ── Parsing ────────────────────────────────────────────────────────────────────
@@ -54,57 +93,6 @@ def parse_schedule(html):
     return []
 
 
-def build_edges(stops):
-    edges = set()
-    for i in range(len(stops) - 1):
-        a = stops[i]["station_code"]
-        b = stops[i + 1]["station_code"]
-        if a in valid_codes and b in valid_codes:
-            edges.add((a, b))
-    return edges
-
-
-# ── Browser ────────────────────────────────────────────────────────────────────
-
-
-async def init_browser(playwright):
-    browser = await playwright.chromium.launch(headless=False)
-    context = await browser.new_context(
-        user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
-    )
-    return browser, await context.new_page()
-
-
-async def init_schedule_page(page):
-    await page.goto("https://enquiry.indianrail.gov.in/mntes/")
-    await page.wait_for_selector("input[name='trainNo']", timeout=10000)
-    await page.get_by_text("Train Schedule", exact=True).click()
-    await page.wait_for_selector("input[name='trainNo']", timeout=10000)
-
-
-async def fetch_schedule(page, train_no):
-    await page.fill("input[name='trainNo']", "")
-    await page.fill("input[name='trainNo']", str(train_no))
-    await page.click("input[value='Get Schedule']")
-
-    try:
-        # Wait for a table that has actual rows with station data
-        await page.wait_for_selector("table tr td", timeout=10000)
-    except Exception:
-        # No schedule found for this train (special/test trains)
-        return await page.content()
-
-    await page.wait_for_timeout(500)
-    return await page.content()
-
-
-async def recover(page):
-    await page.goto("https://enquiry.indianrail.gov.in/mntes/")
-    await page.wait_for_selector("input[name='trainNo']", timeout=10000)
-    await page.get_by_text("Train Schedule", exact=True).click()
-    await page.wait_for_selector("input[name='trainNo']", timeout=10000)
-
-
 # ── Persistence ────────────────────────────────────────────────────────────────
 
 
@@ -127,11 +115,10 @@ def save_final(all_schedules, failed):
 
 async def process_trains(page):
     all_schedules = {}
-    
+
     failed = []
 
     for i, train in enumerate(trains[:5]):
-
         train_no = train["TrainNo"]
         train_name = train["TrainName"]
 
@@ -141,7 +128,6 @@ async def process_trains(page):
 
             if stops:
                 all_schedules[train_no] = {"train_name": train_name, "stops": stops}
-               
 
             print(
                 f"[{i + 1}/{len(trains)}] {train_no} - {train_name}: {len(stops)} stops"
