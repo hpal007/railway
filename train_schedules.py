@@ -32,7 +32,6 @@ async def fetch_schedule(page, train_no):
     await page.fill("input[name='trainNo']", "")
     await page.fill("input[name='trainNo']", str(train_no))
 
-    # Wait for navigation to complete after click
     async with page.expect_navigation(wait_until="load", timeout=15000):
         await page.click("input[value='Get Schedule']")
 
@@ -55,42 +54,96 @@ async def recover(page):
 # ── Parsing ────────────────────────────────────────────────────────────────────
 
 
+def parse_train_info(table):
+    """Extract metadata from the first table"""
+    train_info = {}
+    for row in table.find_all("tr"):
+        tds = row.find_all("td")
+        text = row.text.strip()
+
+        if "Travel Time" in text:
+            train_info["route"] = tds[0].text.strip() if tds else ""
+            travel = tds[1].text.strip() if len(tds) > 1 else ""
+            train_info["travel_time"] = travel.replace("Travel Time:", "").strip()
+
+        elif "Days of Run" in text:
+            train_info["days_of_run"] = (
+                text.split("Days of Run:")[-1].split("Type:")[0].strip()
+            )
+            train_info["type"] = (
+                text.split("Type:")[-1].strip() if "Type:" in text else ""
+            )
+
+        elif "Reserved Class of Travel" in text:
+            train_info["reserved_class"] = (
+                tds[0].text.replace("Reserved Class of Travel:", "").strip()
+                if tds
+                else ""
+            )
+            train_info["unreserved_class"] = (
+                tds[1].text.replace("Un-Reserved Class :", "").strip()
+                if len(tds) > 1
+                else ""
+            )
+
+        elif "Un-Reserved Fare" in text:
+            train_info["fare_category"] = (
+                tds[0].text.replace("Un-Reserved Fare Category :", "").strip()
+                if tds
+                else ""
+            )
+            train_info["season_ticket"] = (
+                tds[1].text.replace("Un-Reserved Season Ticket (MST) :", "").strip()
+                if len(tds) > 1
+                else ""
+            )
+
+    return train_info
+
+
+def parse_stops(table):
+    """Extract stops from the schedule table"""
+    stops = []
+    for row in table.find_all("tr")[1:]:
+        tds = row.find_all("td")
+        if len(tds) < 6:
+            continue
+
+        fonts = tds[1].find_all("font")
+        time_fonts = tds[3].find_all("font")
+
+        stops.append(
+            {
+                "sr": tds[0].text.strip(),
+                "station_name": fonts[0].text.strip() if len(fonts) > 0 else "",
+                "station_code": fonts[1].text.strip() if len(fonts) > 1 else "",
+                "day": tds[2].text.strip(),
+                "arrival": time_fonts[0].text.strip() if len(time_fonts) > 0 else "",
+                "departure": time_fonts[1].text.strip() if len(time_fonts) > 1 else "",
+                "halt": tds[4].text.strip(),
+                "distance_km": tds[5].text.strip(),
+            }
+        )
+    return stops
+
+
 def parse_schedule(html):
     soup = BeautifulSoup(html, "html.parser")
+    train_info = {}
+    stops = []
 
     for table in soup.find_all("table"):
         first_row = table.find("tr")
-        if not first_row or "Station" not in first_row.text:
+        if not first_row:
             continue
 
-        stops = []
-        for row in table.find_all("tr")[1:]:
-            tds = row.find_all("td")
-            if len(tds) < 6:
-                continue
+        if "Days of Run" in table.text and "Travel Time" in table.text:
+            train_info = parse_train_info(table)
 
-            fonts = tds[1].find_all("font")
-            time_fonts = tds[3].find_all("font")
+        elif "Station" in first_row.text:
+            stops = parse_stops(table)
 
-            stops.append(
-                {
-                    "sr": tds[0].text.strip(),
-                    "station_name": fonts[0].text.strip() if len(fonts) > 0 else "",
-                    "station_code": fonts[1].text.strip() if len(fonts) > 1 else "",
-                    "day": tds[2].text.strip(),
-                    "arrival": time_fonts[0].text.strip()
-                    if len(time_fonts) > 0
-                    else "",
-                    "departure": time_fonts[1].text.strip()
-                    if len(time_fonts) > 1
-                    else "",
-                    "halt": tds[4].text.strip(),
-                    "distance_km": tds[5].text.strip(),
-                }
-            )
-        return stops
-
-    return []
+    return train_info, stops
 
 
 # ── Persistence ────────────────────────────────────────────────────────────────
@@ -115,7 +168,6 @@ def save_final(all_schedules, failed):
 
 async def process_trains(page):
     all_schedules = {}
-
     failed = []
 
     for i, train in enumerate(trains[:5]):
@@ -124,10 +176,14 @@ async def process_trains(page):
 
         try:
             html = await fetch_schedule(page, train_no)
-            stops = parse_schedule(html)
+            train_info, stops = parse_schedule(html)
 
             if stops:
-                all_schedules[train_no] = {"train_name": train_name, "stops": stops}
+                all_schedules[train_no] = {
+                    "train_name": train_name,
+                    "info": train_info,
+                    "stops": stops,
+                }
 
             print(
                 f"[{i + 1}/{len(trains)}] {train_no} - {train_name}: {len(stops)} stops"
@@ -136,7 +192,6 @@ async def process_trains(page):
         except Exception as e:
             print(f"  Failed {train_no}: {e}")
             failed.append(train_no)
-            # Only recover on serious failures, not missing schedules
             if "Target page, context or browser has been closed" in str(e):
                 await recover(page)
 

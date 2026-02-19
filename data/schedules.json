@@ -1,6 +1,16 @@
 {
   "00101": {
     "train_name": "PRYJ-CNB MAGHMELA SPL",
+    "info": {
+      "route": "PRAYAGRAJ JN - KANPUR CENTRAL",
+      "travel_time": "04:30 Hrs.",
+      "days_of_run": "Mon,Sun",
+      "type": "MAGH MELA SPECIAL",
+      "reserved_class": "",
+      "unreserved_class": "",
+      "fare_category": "| ORDINARY",
+      "season_ticket": "Allowed"
+    },
     "stops": [
       {
         "sr": "1",
@@ -86,6 +96,16 @@
   },
   "00102": {
     "train_name": "PRYJ CNB MAGHMELA SPL",
+    "info": {
+      "route": "PRAYAGRAJ JN - KANPUR CENTRAL",
+      "travel_time": "05:30 Hrs.",
+      "days_of_run": "Mon,Sun",
+      "type": "MAGH MELA SPECIAL",
+      "reserved_class": "",
+      "unreserved_class": "",
+      "fare_category": "| ORDINARY",
+      "season_ticket": "Allowed"
+    },
     "stops": [
       {
         "sr": "1",
@@ -171,6 +191,16 @@
   },
   "00112": {
     "train_name": "SGTY-AJNI RAPID PARCEL",
+    "info": {
+      "route": "SANKRAIL GOODS TERMINAL - AJNI",
+      "travel_time": "26:50 Hrs.",
+      "days_of_run": "Tue",
+      "type": "PARCEL EXPRESS",
+      "reserved_class": "",
+      "unreserved_class": "",
+      "fare_category": "| MAIL EXPRESS",
+      "season_ticket": "Not Allowed"
+    },
     "stops": [
       {
         "sr": "1",
