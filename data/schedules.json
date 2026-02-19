@@ -1,0 +1,207 @@
+{
+  "00101": {
+    "train_name": "PRYJ-CNB MAGHMELA SPL",
+    "stops": [
+      {
+        "sr": "1",
+        "station_name": "PRAYAGRAJ JN",
+        "station_code": "PRYJ",
+        "day": "1",
+        "arrival": "SRC",
+        "departure": "18:00",
+        "halt": "",
+        "distance_km": "0"
+      },
+      {
+        "sr": "2",
+        "station_name": "SUBEDARGANJ",
+        "station_code": "SFG",
+        "day": "1",
+        "arrival": "18:10",
+        "departure": "18:12",
+        "halt": "2 Min",
+        "distance_km": "4"
+      },
+      {
+        "sr": "3",
+        "station_name": "BHARWARI",
+        "station_code": "BRE",
+        "day": "1",
+        "arrival": "18:48",
+        "departure": "18:50",
+        "halt": "2 Min",
+        "distance_km": "37"
+      },
+      {
+        "sr": "4",
+        "station_name": "SIRATHU",
+        "station_code": "SRO",
+        "day": "1",
+        "arrival": "19:28",
+        "departure": "19:30",
+        "halt": "2 Min",
+        "distance_km": "57"
+      },
+      {
+        "sr": "5",
+        "station_name": "KHAGA",
+        "station_code": "KGA",
+        "day": "1",
+        "arrival": "19:53",
+        "departure": "19:55",
+        "halt": "2 Min",
+        "distance_km": "82"
+      },
+      {
+        "sr": "6",
+        "station_name": "FATEHPUR",
+        "station_code": "FTP",
+        "day": "1",
+        "arrival": "20:28",
+        "departure": "20:30",
+        "halt": "2 Min",
+        "distance_km": "117"
+      },
+      {
+        "sr": "7",
+        "station_name": "BINDKI ROAD",
+        "station_code": "BKO",
+        "day": "1",
+        "arrival": "20:55",
+        "departure": "20:57",
+        "halt": "2 Min",
+        "distance_km": "148"
+      },
+      {
+        "sr": "8",
+        "station_name": "KANPUR CENTRAL",
+        "station_code": "CNB",
+        "day": "1",
+        "arrival": "22:30",
+        "departure": "DSTN",
+        "halt": "",
+        "distance_km": "194"
+      }
+    ]
+  },
+  "00102": {
+    "train_name": "PRYJ CNB MAGHMELA SPL",
+    "stops": [
+      {
+        "sr": "1",
+        "station_name": "PRAYAGRAJ JN",
+        "station_code": "PRYJ",
+        "day": "1",
+        "arrival": "SRC",
+        "departure": "20:25",
+        "halt": "",
+        "distance_km": "0"
+      },
+      {
+        "sr": "2",
+        "station_name": "SUBEDARGANJ",
+        "station_code": "SFG",
+        "day": "1",
+        "arrival": "20:35",
+        "departure": "20:37",
+        "halt": "2 Min",
+        "distance_km": "4"
+      },
+      {
+        "sr": "3",
+        "station_name": "BHARWARI",
+        "station_code": "BRE",
+        "day": "1",
+        "arrival": "21:03",
+        "departure": "21:05",
+        "halt": "2 Min",
+        "distance_km": "37"
+      },
+      {
+        "sr": "4",
+        "station_name": "SIRATHU",
+        "station_code": "SRO",
+        "day": "1",
+        "arrival": "21:33",
+        "departure": "21:35",
+        "halt": "2 Min",
+        "distance_km": "57"
+      },
+      {
+        "sr": "5",
+        "station_name": "KHAGA",
+        "station_code": "KGA",
+        "day": "1",
+        "arrival": "22:05",
+        "departure": "22:07",
+        "halt": "2 Min",
+        "distance_km": "82"
+      },
+      {
+        "sr": "6",
+        "station_name": "FATEHPUR",
+        "station_code": "FTP",
+        "day": "1",
+        "arrival": "22:43",
+        "departure": "22:45",
+        "halt": "2 Min",
+        "distance_km": "117"
+      },
+      {
+        "sr": "7",
+        "station_name": "BINDKI ROAD",
+        "station_code": "BKO",
+        "day": "1",
+        "arrival": "23:15",
+        "departure": "23:17",
+        "halt": "2 Min",
+        "distance_km": "148"
+      },
+      {
+        "sr": "8",
+        "station_name": "KANPUR CENTRAL",
+        "station_code": "CNB",
+        "day": "2",
+        "arrival": "01:55",
+        "departure": "DSTN",
+        "halt": "",
+        "distance_km": "194"
+      }
+    ]
+  },
+  "00112": {
+    "train_name": "SGTY-AJNI RAPID PARCEL",
+    "stops": [
+      {
+        "sr": "1",
+        "station_name": "SANKRAIL GOODS TERMINAL",
+        "station_code": "SGTY",
+        "day": "1",
+        "arrival": "SRC",
+        "departure": "19:30",
+        "halt": "",
+        "distance_km": "0"
+      },
+      {
+        "sr": "2",
+        "station_name": "BILASPUR JN.",
+        "station_code": "BSP",
+        "day": "2",
+        "arrival": "11:00",
+        "departure": "11:10",
+        "halt": "10 Min",
+        "distance_km": "704"
+      },
+      {
+        "sr": "3",
+        "station_name": "AJNI",
+        "station_code": "AJNI",
+        "day": "2",
+        "arrival": "22:20",
+        "departure": "DSTN",
+        "halt": "",
+        "distance_km": "1124"
+      }
+    ]
+  }
+}
