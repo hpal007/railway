@@ -102,7 +102,7 @@ if __name__ == "__main__":
     today = datetime.now().strftime("%Y%m%d")
 
     station_url = "https://indianrailways.gov.in/index/index_data/data.js"
-    station = TrainData(station_url, data_type="stations_indianrailways")
+    station = TrainData(station_url, data_type="indianrailways_station")
     stations = station.extract_stations_from_indianrailways()
     print(f"Total stations found from indianrailways: {len(stations)}")
 
