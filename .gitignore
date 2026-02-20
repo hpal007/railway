@@ -9,3 +9,6 @@ wheels/
 # Virtual environments
 .venv
 .vscode
+data/schedules_progress.json
+mcp
+.DS_Store
